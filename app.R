@@ -2449,6 +2449,7 @@ server <- function(input, output, session) {
       left_px <- hover$range$left + left_pct * (hover$range$right - hover$range$left)
     }
     top_px <- hover$range$top + top_pct * (hover$range$bottom - hover$range$top)
+    print(paste(hover$range$left,",", hover$range$top))
     style <- paste0("position:absolute; 
                     z-index:100;
                     width:300px;",
@@ -2726,13 +2727,16 @@ server <- function(input, output, session) {
     nation.trends.tooltip(hover, y.value, selected.states)
   })
   
-  output$state.CoT <- renderPlot({
+  output$state.CoT <- renderCachedPlot({
     state_name <- input$state_name
     state_initial <- state.abr[state.abr$name == state_name, "abr"]
     ggbar.overall(state_initial, y.value = "p_cases", remove.title = T) + 
       #geom_vline(xintercept=reactive.line$x, color= "black", linetype="solid", size = 1, show.legend = F) +
       NULL
-  }, alt = "A time series bar plot representing the states COVID-19 cases over time, per 100k.")
+  }, alt = "A time series bar plot representing the states COVID-19 cases over time, per 100k.", 
+  cacheKeyExpr={input$state_name},
+  #sizePolicy = sizeGrowthRatio(height = 800, width = 600, growthRate = 1.5),
+  cache = "session")
   
   output$state.CoT.dl <- downloadHandler(
     filename = function() {
@@ -2770,11 +2774,14 @@ server <- function(input, output, session) {
     }
   )
   
-  output$state.DoT <- renderPlot({
+  output$state.DoT <- renderCachedPlot({
     state_name <- input$state_name
     state_initial <- state.abr[state.abr$name == state_name, "abr"]
     ggbar.overall(state_initial, y.value = "p_deaths", remove.title = T)
-  }, alt = "A time series bar plot representing the states COVID-19 deaths over time, per 100k.")
+  }, cacheKeyExpr = {input$state_name},
+  cache = "session",
+  #sizePolicy = sizeGrowthRatio(height = 800, width = 600, growthRate = 1.5),
+  alt = "A time series bar plot representing the states COVID-19 deaths over time, per 100k.")
   
   Tr.ranges <- reactiveValues(x = NULL, y = NULL)
   
@@ -2791,7 +2798,7 @@ server <- function(input, output, session) {
     }
   }) 
   
-  output$state.trends <- renderPlot({
+  output$state.trends <- renderCachedPlot({
     state_name <- input$state_name
     state_initial <- state.abr[state.abr$name == state_name, "abr"]
     counties <- input$SRC.county
@@ -2806,7 +2813,10 @@ server <- function(input, output, session) {
     ggplot.state(state_initial, y.value = y.value, counties = counties,remove.title = T) +
       coord_cartesian(xlim = Tr.ranges$x, ylim = Tr.ranges$y) +
       NULL
-  }, alt = "A time series bar plot representing the states new COVID-19 cases over time")
+  }, cacheKeyExpr = {list(input$state_name, input$SRC.rate, input$SRC.county)},
+  cache = "session",
+  #sizePolicy = sizeGrowthRatio(height = 800, width = 600, growthRate = 1.5),
+  alt = "A time series bar plot representing the states new COVID-19 cases over time")
   
   output$state.trends.dl <- downloadHandler(
     filename = function() {
@@ -3067,9 +3077,12 @@ server <- function(input, output, session) {
     US.barplot.tooltip(hover, "deaths")
   })
   
-  output$US.CoT <- renderPlot({
+  output$US.CoT <- renderCachedPlot({
     ggbar.US(y.value = "cases", remove.title = T)
-  }, alt = "A time series bar plot representing United States cumilative COVID-19 cases over time.")
+  },  cacheKeyExpr = {list("cases")},
+  cache = "session",
+  #sizePolicy = sizeGrowthRatio(height = 800, width = 600, growthRate = 1.5),
+  alt = "A time series bar plot representing United States cumilative COVID-19 cases over time.")
   
   output$US.CoT.dl <- downloadHandler(
     filename = function() {
@@ -3085,9 +3098,12 @@ server <- function(input, output, session) {
     }
   )
   
-  output$US.DoT <- renderPlot({
+  output$US.DoT <- renderCachedPlot({
     ggbar.US(y.value = "deaths", remove.title = T)
-  }, alt = "A time series bar plot representing United States cumilative COVID-19 deaths over time.")
+  },  cacheKeyExpr = {list("deaths")},
+  cache = "session",
+  #sizePolicy = sizeGrowthRatio(height = 800, width = 600, growthRate = 1.5),
+  alt = "A time series bar plot representing United States cumilative COVID-19 deaths over time.")
   
   output$US.DoT.dl <- downloadHandler(
     filename = function() {
@@ -3103,7 +3119,7 @@ server <- function(input, output, session) {
     }
   )
   
-  output$US.trends <- renderPlot({
+  output$US.trends <- renderCachedPlot({
     selected.states <- data.frame(name = input$NRC.state)
     selected.states <- selected.states %>%
       left_join(state.abr[c("name", "abr")],
@@ -3119,7 +3135,10 @@ server <- function(input, output, session) {
     ggplot.US(y.value=y.value, moving.avg.window=7, selected.states=selected.states$abr, remove.title=T) +
       coord_cartesian(xlim = Tr.ranges$x, ylim = Tr.ranges$y) +
       NULL
-  }, alt = "A time series plot representing United States new COVID-19 cases over time, broken down by state.")
+  },  cacheKeyExpr = {list(input$NRC.rate, input$NRC.state)},
+  cache = "session",
+  #sizePolicy = sizeGrowthRatio(height = 800, width = 600, growthRate = 1.5),
+  alt = "A time series plot representing United States new COVID-19 cases over time, broken down by state.")
   
   output$US.trends.dl <- downloadHandler(
     filename = function() {

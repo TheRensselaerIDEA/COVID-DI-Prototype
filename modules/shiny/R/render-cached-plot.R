@@ -294,6 +294,7 @@ renderCachedPlot <- function(expr,
   sizePolicy = sizeGrowthRatio(width = 400, height = 400, growthRate = 1.2),
   res = 72,
   cache = "app",
+  alt = "",
   ...,
   outputArgs = list()
 ) {
@@ -399,7 +400,8 @@ renderCachedPlot <- function(expr,
             width = width,
             height = height,
             pixelratio = pixelratio,
-            res = res
+            res = res,
+            alt = alt
           ),
           args
         ))
