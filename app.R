@@ -302,23 +302,28 @@ ui <-
                                )),
                tags$br(),
                fluidRow(column(12, style="text-align:center;",
-                               uiOutput("US.determinant.title")),
-                        column(6,
-                               selectInput(inputId = "US.determinant",
-                                           label = "Determinant",
-                                           title = "Determinant selecting form tool",
-                                           choices = c("Diabetes", "Obesity", "CRD Mortality", "Heart Disease Mortality"),
-                                           selected = "Diabetes"),
-                               leafletOutput("US.maps.determinant", height = height),
-                               column(2, downloadButton("US.maps.determinant.dl", label="Download Determinant Map"), offset = 6), offset = 3),
-                        column(8, style="text-align:center;",
-                               tags$p(textOutput("US.determinant.text"),
-                                      tags$br(),
-                                      tags$b("Data Source: "), tags$a("CDC", href="www.cdc.gov/diabetes/data"), ", ",
-                                      tags$a("CHR", href = 
-                                               "https://www.countyhealthrankings.org/explore-health-rankings/measures-data-sources/county-health-rankings-model/health-factors/health-behaviors/diet-exercise/adult-obesity")), 
-                               offset = 2
-                        )),
+                               uiOutput("US.determinant.title"), offset=0),
+                 column(12, img(src='national_determinants.png', align = "left"), offset = 3),
+                 column(12, img(src='national_coefficients.png', align = "left"), offset = 3)
+                        ),
+               # fluidRow(column(12, style="text-align:center;",
+               #                 uiOutput("US.determinant.title")),
+               #          column(6,
+               #                 selectInput(inputId = "US.determinant",
+               #                             label = "Determinant",
+               #                             title = "Determinant selecting form tool",
+               #                             choices = c("Diabetes", "Obesity", "CRD Mortality", "Heart Disease Mortality"),
+               #                             selected = "Diabetes"),
+               #                 leafletOutput("US.maps.determinant", height = height),
+               #                 column(2, downloadButton("US.maps.determinant.dl", label="Download Determinant Map"), offset = 6), offset = 3),
+               #          column(8, style="text-align:center;",
+               #                 tags$p(textOutput("US.determinant.text"),
+               #                        tags$br(),
+               #                        tags$b("Data Source: "), tags$a("CDC", href="www.cdc.gov/diabetes/data"), ", ",
+               #                        tags$a("CHR", href = 
+               #                                 "https://www.countyhealthrankings.org/explore-health-rankings/measures-data-sources/county-health-rankings-model/health-factors/health-behaviors/diet-exercise/adult-obesity")), 
+               #                 offset = 2
+               #          )),
                tags$br(),
                tags$br(),
                fluidRow(column(12, style="text-align:center;",
@@ -2887,13 +2892,9 @@ server <- function(input, output, session) {
   })
   
   output$US.determinant.title <- renderUI({
-    det <- input$US.determinant
-    if (det == "CRD Mortality") {
-      det <- "Cronic Respiratory Disease (CRD) Mortality"
-    }
     tagList(
-      tags$h2(paste0("United States ", det, " Disparities")),
-      tags$h3(paste0("What are the nationwide disparities in ", det, " Rates compared to the US Average?"))
+      tags$h2(paste0("Signficant United States Determinants")),
+      tags$h3(paste0("What are the significant socioeconomic and medical determinants that impact COVID incidence?"))
     )
   })
   
