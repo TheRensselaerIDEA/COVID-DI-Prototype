@@ -303,8 +303,9 @@ ui <-
                tags$br(),
                fluidRow(column(12, style="text-align:center;",
                                uiOutput("US.determinant.title"), offset=0),
-                 column(12, img(src='national_determinants.png', align = "left"), offset = 3),
-                 column(12, img(src='national_coefficients.png', align = "left"), offset = 3)
+                 column(12, img(src='national_determinants_cropped.png', align = "left"), offset = 3),
+                 column(12, style="text-align:center;", uiOutput("US.coefficient.title"), offset=0),
+                 column(12, img(src='national_coefficients_cropped.png', align = "left"), offset = 3)
                         ),
                # fluidRow(column(12, style="text-align:center;",
                #                 uiOutput("US.determinant.title")),
@@ -2894,7 +2895,14 @@ server <- function(input, output, session) {
   output$US.determinant.title <- renderUI({
     tagList(
       tags$h2(paste0("Signficant United States Determinants")),
-      tags$h3(paste0("What are the significant socioeconomic and medical determinants that impact COVID incidence?"))
+      tags$h3(paste0("What are the significant socioeconomic and medical determinants that impact COVID mortality rates?"))
+    )
+  })
+  
+  output$US.coefficient.title <- renderUI({
+    tagList(
+      tags$h2(paste0("Signficant United States Coefficients")),
+      tags$h3(paste0("What are the significant socioeconomic and medical coefficients that impact COVID mortality rates?"))
     )
   })
   
