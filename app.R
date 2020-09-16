@@ -8,7 +8,7 @@ source("modules/gt_gen.R")
 sourceDir("modules/shiny/R")
 
 
-update_date <- "2020-09-15"
+update_date <- "2020-09-16"
 
 
 moving.avg.window <- 7 # WARNING: Behavior for moving.avg.window > number of report dates for a region is undefined.
