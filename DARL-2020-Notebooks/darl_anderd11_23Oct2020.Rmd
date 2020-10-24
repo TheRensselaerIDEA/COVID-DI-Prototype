@@ -13,7 +13,7 @@ subtitle: "COVIDMINDER"
 
 * RCS ID: anderd11
 * Project Name: COVIDMINDER
-* Branch Name: **missing**
+* Branch Name: darl_anderd11_23Oct2020
 
 * Midterm presentation on 20 Oct, 2020: [COVIDMINDER Midterm Presentation Fall 2020](DARLF20_COVIDMINDER_Presentation1.pdf)
 
