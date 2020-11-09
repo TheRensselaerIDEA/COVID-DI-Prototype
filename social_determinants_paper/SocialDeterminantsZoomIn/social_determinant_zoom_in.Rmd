@@ -15,7 +15,7 @@ source("Source.R")
 COVID mortality data
 
 ```{r}
-date_of_study = "08-04-2020"
+date_of_study = "10-05-2020"
 
 chr <- read_csv("../Data/2020CHR.csv")
 chr <- chr[, -grep("Quartile", colnames(chr))]
@@ -34,7 +34,7 @@ covid_us_hist = merge(x = covid_us_hist,y = geo, by.x = "FIPS", by.y = "county_f
 covid_us_hist = merge(x = covid_us_hist,y = chr, by = "FIPS", all.x = TRUE)
 covid_us_hist$period = "03-22-2020"
 
-date_of_all = format(seq(as.Date("2020-03-23"), as.Date(strptime(date_of_study,"%m-%d-%Y")), by = "weeks"),"%m-%d-%Y")
+date_of_all = format(seq(as.Date("2020-03-23"), as.Date(strptime(date_of_study,"%m-%d-%Y")), by = "month"),"%m-%d-%Y")
 
 for (i in 1:length(date_of_all)){
   covid_daily = read.csv(text=getURL(paste0("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/",date_of_all[i],".csv")))
@@ -50,20 +50,37 @@ for (i in 1:length(date_of_all)){
 covid_us_hist <- dplyr::rename(covid_us_hist, c(county_fips = FIPS, death_num = Deaths, population = Population))
 covid_us_hist$death_cause <- "COVID-19"
 covid_us_hist$death_rate <- covid_us_hist$death_num/covid_us_hist$population*100000
+save(covid_us_hist, file='covid_us_hist.rda')
 
 ```
 
 COVID correlations
 
 ```{r}
-state <- "US"
+state.abbr <- "OH"
 death.cause <- "COVID-19"
 
-county.clusters <- cluster.counties(cdc.mort.mat(covid_us_hist, state, death.cause),
-                                    cluster.method="kmeans",
-                                    cluster.num=6)
+if (state.abbr != "US") {
+    covid.mort.mat <- dplyr::filter(covid_us_hist, state_abbr == state.abbr) %>%
+                          tidyr::drop_na(county_fips) %>%
+                          dplyr::select(county_fips, death_rate, period) %>%
+                          dplyr::group_by(period) %>% 
+                          dplyr::mutate(id=1:n()) %>%
+                          tidyr::spread(key = period, value = death_rate) %>%
+                          dplyr::arrange(county_fips)
+}else {
+    covid.mort.mat <- covid_us_hist %>%
+                          tidyr::drop_na(county_fips) %>%
+                          dplyr::select(county_fips, death_rate, period) %>%
+                          dplyr::group_by(period) %>% 
+                          dplyr::mutate(id=1:n()) %>%
+                          tidyr::spread(key = period, value = death_rate) %>%
+                          dplyr::arrange(county_fips)
+}
+
+county.clusters <- km.func(covid.mort.mat, cluster.num=3)
 cluster.deathrates <- get.cluster.deathrate.during.time(county.clusters, covid_us_hist, death.cause)
-cluster.order.map <- get.cluster.order.map(cluster.deathrates, time.period = "08-03-2020")
+cluster.order.map <- get.cluster.order.map(cluster.deathrates, time.period = "09-23-2020")
 county.clusters.ordered <- order.county.clusters(county.clusters, cluster.order.map)
 cluster.deathrates.ordered <- order.cluster.deathrate.during.time(cluster.deathrates, cluster.order.map)
 
@@ -77,7 +94,10 @@ kendall.cor <- kendall.cor[kendall.cor$kendall_p <= .05,]
 Select a social determinant. In app will be done by clicking a dterminant bar
 
 ```{r}
-selected.determinant <- kendall.cor$chr_code[14]
+print(kendall.cor$chr_code)
+```
+```{r}
+selected.determinant <- kendall.cor$chr_code[9]
 print(selected.determinant)
 ```
 
@@ -103,10 +123,10 @@ Create scatter plot of determinant vs morality with points colored by cluster
 # for scatter need to append most recent deathrate
 cluster.determinant.vals.deathrate <- dplyr::inner_join(cluster.determinant.vals, 
                                               cdc.mort.mat(covid_us_hist, state, death.cause
-                                                            )[c("county_fips", "08-03-2020")],
+                                                            )[c("county_fips", "09-23-2020")],
                                               by = "county_fips")
 
-colnames(cluster.determinant.vals.deathrate)[colnames(cluster.determinant.vals.deathrate)=="08-03-2020"] <- "mortality_rate"
+colnames(cluster.determinant.vals.deathrate)[colnames(cluster.determinant.vals.deathrate)=="09-23-2020"] <- "mortality_rate"
 
 cluster.scatter <- ggplot(cluster.determinant.vals.deathrate)  + 
   geom_point(aes_string(y = selected.determinant, x = "mortality_rate", color = "cluster")) +
@@ -116,5 +136,3 @@ cluster.scatter <- ggplot(cluster.determinant.vals.deathrate)  +
 
 cluster.scatter
 ```
-
-
