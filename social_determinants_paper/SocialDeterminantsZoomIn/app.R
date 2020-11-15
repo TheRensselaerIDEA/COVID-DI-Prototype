@@ -41,8 +41,8 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-            uiOutput("textDeathTrends"),
-            plotOutput("trendPlot"),
+            # uiOutput("textDeathTrends"),
+            # plotOutput("trendPlot"),
             plotOutput("kendallPlot")
         )
     )
