@@ -253,4 +253,3 @@ ggplot(combined_determinants_data, aes(x=Row.names, y=MRRX100)) +
 
 ggsave("combined_determinants.png")
 ```
-
